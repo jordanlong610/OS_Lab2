@@ -1,5 +1,6 @@
 /*
 * forkex.c - an example of using fork to create processes and execute new tasks
+* Author: Jordan Long
 *
 */
 #include <unistd.h>
@@ -7,24 +8,8 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <string.h>
-/*
-* execute - execute the given command with the given arguments, and the given environment
-* const char *binary - the name of the binary file to load (e.g. /bin/ls)
-* char *const arguments[] - the argv array - remember, argv[0] must be the command name
-* char *const envp[] - the array of environment variables for this session
-*
-* note:
-*	const char *variable - a string whose contents won't be changed
-*	char *const variable[] - a array of pointers (strings) whose content's won't be changed
-*	- but the things the pointers point at may be changed.
-*/
-void execute(const char *binary, char *const arguments[], char *const envp[])
-{
-	if (execve(binary, arguments, envp) < 0)
-	{
-		perror("Could not execute command.");
-	}
-}
+
+
 
 /**
  * count the number of arguments.
@@ -58,41 +43,27 @@ char **buildCommandLine(const char *commandLine)
 {
 
 
+    int i = 0;
+    char *p = strtok (commandLine, " ");
+    char *array[10];
 
+    while (p != NULL)
+    {
+        array[i++] = p;
+        p = strtok (NULL, " ");
+    }
 
 }
 
 
 
-
-
-int main(int argc, char **argv, char **envp)
+/*
+ * Takes in the command and arguments and forks the parent process.
+ */
+void createForkedProcess(char *arguments)
 {
-	//Ask user for command and arguments
 
-	char input[40];
-
-	printf ("Enter a command and arguments to run: ");
-	scanf ("%s", input);
-
-	printf(input);
-
-
-	 char * pch;
-	 pch = strtok (input," ,.-");
-	 while (pch != NULL)
-	 {
-	  printf ("%s\n",pch);
-	  pch = strtok (NULL, " ,.-");
-	 }
-
-
-
-
-
-
-
-	//Fork child process from parent
+//Fork child process from parent
 	pid_t pid = fork( );
 	//If pid goes negative, fork has failed. Throws error and exits.
 	if (pid < 0)
@@ -101,21 +72,13 @@ int main(int argc, char **argv, char **envp)
 		exit(-1);
 	}
 
-
-
-
 	// pid is 0? a new process was created, and this copy is it
 	if (pid == 0)
 	{
-		// null terminator is important - when a "null string" is encountered
-		// it signals the end of the array of strings
-		char *arguments[3] = { "/bin/ls", "-l", 0x00 };
-		// execute the new command, with the new arguments, and the environment
-		execute("/bin/ls", arguments, envp);
+		execute(arguments);
 		// this should never return - so if it doesn't, something bad happened.
 		abort( );
 	}
-
 
 
 	// pid is not 0? then it is the pid of the child
@@ -127,5 +90,34 @@ int main(int argc, char **argv, char **envp)
 		printf("This is still the parent: child exited with status %x\n",
 		status);
 	}
-	return 0;
+}
+
+/*
+ * Takes the command and arguments and executes it.
+ */
+void execute(const char *arguments)
+{
+	if(execvp(arguments[0], arguments) < 0)
+	{
+		perror("Could not execute command.");
+	}
+}
+
+
+/*
+ * Main class for the project. Takes in user input and stores it in a char array. Then calls the fork method.
+ */
+int main(int argc, char **argv, char **envp)
+{
+	//Ask user for command and arguments
+
+	char commandLine[40];
+
+	printf ("Enter a command and arguments to run: ");
+	scanf ("%s", commandLine);
+
+	buildCommandLine(commandLine);
+
+
+return 0;
 }
