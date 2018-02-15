@@ -1,0 +1,1 @@
+forkex.o: ../forkex.c
