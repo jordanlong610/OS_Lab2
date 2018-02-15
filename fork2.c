@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <string.h>
 /*
 * execute - execute the given command with the given arguments, and the given environment
 * const char *binary - the name of the binary file to load (e.g. /bin/ls)
@@ -75,6 +76,15 @@ int main(int argc, char **argv, char **envp)
 	scanf ("%s", input);
 
 	printf(input);
+
+
+	 char * pch;
+	 pch = strtok (input," ,.-");
+	 while (pch != NULL)
+	 {
+	  printf ("%s\n",pch);
+	  pch = strtok (NULL, " ,.-");
+	 }
 
 
 
